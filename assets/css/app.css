@@ -12,23 +12,29 @@
   height: 25px;
   width: 25px;
   float: left;
+  position: relative;
 }
 
 .tile-wall {
-  background-color: black
+  background-color: black;
 }
 
 .tile-grass {
-  background-color: green
+  background-color: green;
 }
 
 .hero {
-  background-color: blue
+  z-index: 10;
+  position: absolute;
+}
+
+.hero.my {
+  z-index: 100;
 }
 
 .hero .name {
-  position: relative;
-  left: 100%;
+  position: absolute;
+  left: 30px;
   color: white;
 }
 
@@ -37,7 +43,7 @@
   color: yellow;
 }
 
-.hero.dead {
-  background-color: red
+.hero.dead .name {
+  color: red;
 }
 
