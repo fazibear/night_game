@@ -3,6 +3,9 @@
 @import "./phoenix.css";
 @import "../../deps/phoenix_live_view/assets/css/live_view.css";
 
+body {
+  background-color: gray;
+}
 
 .map {
   width: 25*32px;
