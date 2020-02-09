@@ -21,6 +21,10 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
   
   * Run `mix test` to run tests
 
+## Build status
+  
+[![Build Status](https://travis-ci.org/fazibear/night_game.svg?branch=master)](https://travis-ci.org/fazibear/night_game)
+
 ## Working example
 
 Visit [`https://nightgame.herokuapp.com/`](https://nightgame.herokuapp.com/) from your browser.
