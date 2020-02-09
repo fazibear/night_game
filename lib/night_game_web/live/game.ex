@@ -9,9 +9,9 @@ defmodule NightGameWeb.Game do
   def render(assigns) do
     ~L"""
     <h1>
-      <%= @name %>
+      You're playing <%= @name %>
       <%= if Map.get(@info, :dead, false) do %>
-        IS DEAD
+        (DEAD)
       <% end %>
     </h1>
     <div class="map" phx-window-keydown="key">
@@ -21,7 +21,7 @@ defmodule NightGameWeb.Game do
             <div class="grid tile-<%= tile %>"></div>
           <% {:hero, name, dead} -> %>
             <div class="grid hero <%= if dead, do: "dead", else: "" %>">
-              <div class="name">
+              <div class="name <%= if @name == name, do: "my", else: "" %>">
                 <%= name %>
               </div>
             </div>

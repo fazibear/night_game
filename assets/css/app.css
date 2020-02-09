@@ -30,7 +30,11 @@
   position: relative;
   left: -50%;
   color: white;
+}
 
+.hero .name.my {
+  font-weight: bold;
+  color: yellow;
 }
 
 .hero.dead {
