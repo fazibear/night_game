@@ -28,7 +28,7 @@
 
 .hero .name {
   position: relative;
-  left: -50%;
+  left: 100%;
   color: white;
 }
 
