@@ -135,6 +135,7 @@ defmodule NightGame.World do
     case Enum.at(map, position) do
       {:heroes, heroes} ->
         List.replace_at(map, position, {:heroes, heroes ++ [{name, is_dead?}]})
+
       _ ->
         List.replace_at(map, position, {:heroes, [{name, is_dead?}]})
     end
