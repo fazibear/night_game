@@ -19,11 +19,15 @@ defmodule NightGameWeb.Game do
         <%= case tile do %>
           <% {:tile, tile} -> %>
             <div class="grid tile-<%= tile %>"></div>
-          <% {:hero, name, dead} -> %>
-            <div class="grid hero <%= if dead, do: "dead", else: "" %>">
-              <div class="name <%= if @name == name, do: "my", else: "" %>">
-                <%= name %>
-              </div>
+          <% {:heroes, heroes} -> %>
+            <div class="grid heroes">
+              <%= for {name, dead} <- heroes do %>
+                <div class="hero <%= if dead, do: "dead", else: "" %> <%= if @name == name, do: "my", else: "" %>">
+                  <div class="name">
+                    <%= name %>
+                  </div>
+                </div>
+              <% end %>
             </div>
           <% _ -> %><div class="grid"></div>
         <% end %>

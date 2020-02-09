@@ -32,7 +32,7 @@
   color: white;
 }
 
-.hero .name.my {
+.hero.my .name {
   font-weight: bold;
   color: yellow;
 }

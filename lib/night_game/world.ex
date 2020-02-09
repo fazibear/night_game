@@ -7,7 +7,7 @@ defmodule NightGame.World do
   World is the list of tuples:
    - {:tile, :grass}
    - {:tile, :wall}
-   - {:hero, name, is_dead?}
+   - {:heroes, [{name, is_dead}]
   """
 
   @width 30
@@ -129,10 +129,15 @@ defmodule NightGame.World do
   ## Examples
 
     iex> NightGame.World.put_hero([{:tile, :grass}], 0, "my_hero", false)
-    [{:hero, "my_hero", false}]
+    [{:heroes, [{"my_hero", false}]}]
   """
-  def put_hero(map, position, name, dead) do
-    List.replace_at(map, position, {:hero, name, dead})
+  def put_hero(map, position, name, is_dead?) do
+    case Enum.at(map, position) do
+      {:heroes, heroes} ->
+        List.replace_at(map, position, {:heroes, heroes ++ [{name, is_dead?}]})
+      _ ->
+        List.replace_at(map, position, {:heroes, [{name, is_dead?}]})
+    end
   end
 
   defp move_to(position, delta) do
