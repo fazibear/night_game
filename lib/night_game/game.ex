@@ -72,11 +72,15 @@ defmodule NightGame.Game do
 
   @impl true
   def handle_call(:map, _from, state) do
-    tiles =
-      World.tiles()
-      |> add_heroes(state.heroes)
+    map =
+      Enum.reduce(state.heroes, World.map(), fn {name, pid}, map ->
+        case Hero.info(pid) do
+          %{x: x, y: y, dead?: dead?} -> World.put_hero(map, x, y, name, dead?)
+          _ -> map
+        end
+      end)
 
-    {:reply, tiles, state}
+    {:reply, map, state}
   end
 
   @impl true
@@ -87,10 +91,12 @@ defmodule NightGame.Game do
           state
 
         _ ->
+          {x, y} = new_hero_position(position)
+
           {:ok, pid} =
             DynamicSupervisor.start_child(
               NightGame.GameSupervisor,
-              {Hero, %{position: new_hero_position(position)}}
+              {Hero, [x: x, y: y]}
             )
 
           Process.monitor(pid)
@@ -128,9 +134,20 @@ defmodule NightGame.Game do
   def handle_cast({:attack, name}, state) do
     case state do
       %{heroes: %{^name => pid}} ->
-        pid
-        |> Hero.attack()
-        |> kill(Map.delete(state.heroes, name))
+        %{x: x, y: y} = Hero.info(pid)
+
+        state.heroes
+        |> Map.delete(name)
+        |> Enum.each(fn {_name, enemy_pid} ->
+          case Hero.info(enemy_pid) do
+            %{x: enemy_x, y: enemy_y, dead?: false}
+            when enemy_x in (x - 1)..(x + 1) and enemy_y in (y - 1)..(y + 1) ->
+              Hero.kill(enemy_pid)
+
+            _ ->
+              :nothing
+          end
+        end)
 
       _ ->
         :nothing
@@ -139,25 +156,7 @@ defmodule NightGame.Game do
     {:noreply, state}
   end
 
-  defp add_heroes(map, heroes) do
-    Enum.reduce(heroes, map, fn {name, pid}, map ->
-      case Hero.info(pid) do
-        %{position: position, dead: dead} -> World.put_hero(map, position, name, dead)
-        _ -> map
-      end
-    end)
-  end
-
-  defp kill(positions, heroes) do
-    heroes
-    |> Map.values()
-    |> Enum.map(fn pid ->
-      Enum.map(positions, fn position ->
-        Hero.kill(pid, position)
-      end)
-    end)
-  end
-
-  defp new_hero_position(:random), do: World.random_position()
+  # TODO: make it random
+  defp new_hero_position(:random), do: {1, 1}
   defp new_hero_position(position), do: position
 end

@@ -1,7 +1,10 @@
 defmodule NightGame.GameTest do
   use ExUnit.Case, async: false
 
-  alias NightGame.Game
+  alias NightGame.{
+    Game,
+    World
+  }
   doctest NightGame.Game
 
   setup do
@@ -10,7 +13,7 @@ defmodule NightGame.GameTest do
 
   test "spawn new hero" do
     hero = Game.get_or_spawn_hero("test")
-    assert hero.dead == false
+    assert hero.dead? == false
   end
 
   test "spawn new hero and get once again" do
@@ -20,30 +23,30 @@ defmodule NightGame.GameTest do
   end
 
   test "hero is on the map" do
-    Game.get_or_spawn_hero("test", 65)
-    assert Enum.at(Game.map(), 65) == {:heroes, [{"test", false}]}
+    Game.get_or_spawn_hero("test", {3, 3})
+    assert World.get(Game.map(), 3, 3) == {:heroes, [{"test", false}]}
   end
 
   test "hero can move left" do
-    Game.get_or_spawn_hero("test", 65)
+    Game.get_or_spawn_hero("test", {3, 3})
     Game.move_hero("test", :left)
-    assert Enum.at(Game.map(), 64) == {:heroes, [{"test", false}]}
+    assert World.get(Game.map(), 2, 3) == {:heroes, [{"test", false}]}
   end
 
   test "hero will kill" do
-    Game.get_or_spawn_hero("test1", 65)
-    Game.get_or_spawn_hero("test2", 64)
+    Game.get_or_spawn_hero("test1", {3, 3})
+    Game.get_or_spawn_hero("test2", {3, 4})
     Game.attack("test1")
-    assert Enum.at(Game.map(), 64) == {:heroes, [{"test2", true}]}
+    assert World.get(Game.map(), 3, 4) == {:heroes, [{"test2", true}]}
   end
 
   test "hero will kill and respawn after 5 seconds" do
-    Game.get_or_spawn_hero("test1", 65)
-    Game.get_or_spawn_hero("test2", 64)
+    Game.get_or_spawn_hero("test1", {3, 3})
+    Game.get_or_spawn_hero("test2", {3, 4})
     Game.attack("test1")
-    assert Enum.at(Game.map(), 64) == {:heroes, [{"test2", true}]}
+    assert World.get(Game.map(), 3, 4) == {:heroes, [{"test2", true}]}
     Process.sleep(6000)
-    %{position: position} = Game.get_or_spawn_hero("test2")
-    assert Enum.at(Game.map(), position) == {:heroes, [{"test2", false}]}
+    %{x: x, y: y} = Game.get_or_spawn_hero("test2")
+    assert World.get(Game.map(), x, y) == {:heroes, [{"test2", false}]}
   end
 end

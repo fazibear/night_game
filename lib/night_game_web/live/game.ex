@@ -15,22 +15,26 @@ defmodule NightGameWeb.Game do
       <% end %>
     </h1>
     <div class="map" phx-window-keydown="key">
-      <%= for tile <- @map do %>
-        <%= case tile do %>
-          <% {:tile, tile} -> %>
-            <div class="grid tile-<%= tile %>"></div>
-          <% {:heroes, heroes} -> %>
-            <div class="grid heroes">
-              <%= for {name, dead} <- heroes do %>
-                <div class="hero <%= if dead, do: "dead", else: "" %> <%= if @name == name, do: "my", else: "" %>">
-                  <div class="name">
-                    <%= name %>
+      <%= for row <- Tuple.to_list(@map) do %>
+        <div class="row">
+        <%= for tile <- Tuple.to_list(row) do %>
+          <%= case tile do %>
+            <% {:heroes, heroes} -> %>
+              <div class="grid heroes">
+                <%= for {name, dead} <- heroes do %>
+                  <div class="hero <%= if dead, do: "dead", else: "" %> <%= if @name == name, do: "my", else: "" %>">
+                    <div class="name">
+                      <%= name %>
+                    </div>
                   </div>
-                </div>
-              <% end %>
-            </div>
-          <% _ -> %><div class="grid"></div>
+                <% end %>
+              </div>
+            <% {_, tile} -> %>
+              <div class="grid tile-<%= tile %>"></div>
+            <% _ -> %><div class="grid"></div>
+          <% end %>
         <% end %>
+        </div>
       <% end %>
     </div>
     """
