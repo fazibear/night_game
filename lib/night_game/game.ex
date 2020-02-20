@@ -134,20 +134,12 @@ defmodule NightGame.Game do
   def handle_cast({:attack, name}, state) do
     case state do
       %{heroes: %{^name => pid}} ->
-        %{x: x, y: y} = Hero.info(pid)
+        attacker = Hero.info(pid)
 
         state.heroes
         |> Map.delete(name)
-        |> Enum.each(fn {_name, enemy_pid} ->
-          case Hero.info(enemy_pid) do
-            %{x: enemy_x, y: enemy_y, dead?: false}
-            when enemy_x in (x - 1)..(x + 1) and enemy_y in (y - 1)..(y + 1) ->
-              Hero.kill(enemy_pid)
-
-            _ ->
-              :nothing
-          end
-        end)
+        |> Map.values()
+        |> Enum.each(&try_to_kill(attacker, Hero.info(&1), &1))
 
       _ ->
         :nothing
@@ -155,6 +147,13 @@ defmodule NightGame.Game do
 
     {:noreply, state}
   end
+
+  defp try_to_kill(%{x: x, y: y}, %{x: enemy_x, y: enemy_y, dead?: false}, enemy_pid)
+       when enemy_x in (x - 1)..(x + 1) and enemy_y in (y - 1)..(y + 1) do
+    Hero.kill(enemy_pid)
+  end
+
+  defp try_to_kill(_, _, _), do: :nothing
 
   # TODO: make it random
   defp new_hero_position(:random), do: {1, 1}
