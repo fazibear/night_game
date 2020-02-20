@@ -3,7 +3,7 @@ defmodule NightGame.World do
   World is the tuple of tuples of tuples:
    - {:obstacle, :grass}
    - {:ground, :wall}
-   - {:heroes, [{name, is_dead}]  
+   - {:heroes, [{name, is_dead}]  G
   """
 
   @map Application.get_env(:night_game, :map)
@@ -15,7 +15,7 @@ defmodule NightGame.World do
 
   ## Examples
 
-    iex> NightGame.World.can_move_to?(World.map(), 4, 2)
+    iex> NightGame.World.can_move_to?(NightGame.World.map(), 4, 2)
     true
   """
   def can_move_to?(map, x, y) do
@@ -30,7 +30,7 @@ defmodule NightGame.World do
 
   ## Examples
 
-    iex> map = NightGame.World.put_hero(World.map(), 3, 3, "my_hero", false)
+    iex> map = NightGame.World.put_hero(NightGame.World.map(), 3, 3, "my_hero", false)
     iex> NightGame.World.get(map, 3, 3)
     {:heroes, [{"my_hero", false}]}
   """
@@ -49,7 +49,7 @@ defmodule NightGame.World do
 
   ## Examples
 
-    iex> NightGame.World.get(World.map(), 3, 3)
+    iex> NightGame.World.get(NightGame.World.map(), 3, 3)
     {:ground, :grass}
   """
   def get(map, x, y) do
@@ -65,7 +65,7 @@ defmodule NightGame.World do
 
   ## Examples
 
-    iex> map = NightGame.World.put(World.map(), 3, 3, {:test, :something})
+    iex> map = NightGame.World.put(NightGame.World.map(), 3, 3, {:test, :something})
     iex> NightGame.World.get(map, 3, 3)
     {:test, :something}
   """
@@ -79,5 +79,29 @@ defmodule NightGame.World do
     )
   rescue
     ArgumentError -> :error
+  end
+
+  @doc """
+  Returns valid random position on the map.
+
+  ## Examples
+
+    NightGame.World.random_position(NightGame.World.map())
+  """
+  def random_position(map) do
+    map
+    |> Tuple.to_list()
+    |> Enum.with_index()
+    |> Enum.reduce([], fn {row, y}, acc ->
+      row
+      |> Tuple.to_list()
+      |> Enum.with_index()
+      |> Enum.reduce([], fn
+        {{:ground, _}, x}, acc -> acc ++ [{x, y}]
+        {_, _}, acc -> acc
+      end)
+      |> Kernel.++(acc)
+    end)
+    |> Enum.random()
   end
 end

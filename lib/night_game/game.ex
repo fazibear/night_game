@@ -155,7 +155,6 @@ defmodule NightGame.Game do
 
   defp try_to_kill(_, _, _), do: :nothing
 
-  # TODO: make it random
-  defp new_hero_position(:random), do: {1, 1}
+  defp new_hero_position(:random), do: World.random_position(World.map())
   defp new_hero_position(position), do: position
 end
