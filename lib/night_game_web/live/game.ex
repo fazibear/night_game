@@ -94,7 +94,7 @@ defmodule NightGameWeb.Game do
   end
 
   @impl true
-  def handle_event("key", _, socket) do
+  def handle_event("key", _event, socket) do
     refresh()
     {:noreply, socket}
   end
@@ -109,7 +109,7 @@ defmodule NightGameWeb.Game do
     {:noreply, socket}
   end
 
-  def refresh() do
+  def refresh do
     Phoenix.PubSub.broadcast(NightGame.PubSub, "game", :refresh)
   end
 

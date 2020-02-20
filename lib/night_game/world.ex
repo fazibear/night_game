@@ -37,9 +37,9 @@ defmodule NightGame.World do
   def put_hero(map, x, y, name, is_dead?) do
     case get(map, x, y) do
       {:heroes, heroes} ->
-        put(map, x, y, {:heroes, heroes ++ [{name, is_dead?}]})
+        put(map, x, y, {:heroes, [{name, is_dead?} | heroes]})
 
-      _ ->
+      _other ->
         put(map, x, y, {:heroes, [{name, is_dead?}]})
     end
   end
@@ -97,7 +97,7 @@ defmodule NightGame.World do
       |> Tuple.to_list()
       |> Enum.with_index()
       |> Enum.reduce([], fn
-        {{:ground, _}, x}, acc -> acc ++ [{x, y}]
+        {{:ground, _}, x}, acc -> [{x, y} | acc]
         {_, _}, acc -> acc
       end)
       |> Kernel.++(acc)

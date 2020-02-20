@@ -63,10 +63,10 @@ defmodule NightGame.Hero do
 
   ## Examples
 
-    #iex> {:ok, pid} = NightGame.Hero.start_link(x: 4, y: 2)
-    #iex> NightGame.Hero.kill(pid)
-    #iex> NightGame.Hero.info(pid)
-    #%NightGame.Hero{dead?: true, x: 4, y: 2}
+    iex> {:ok, pid} = NightGame.Hero.start_link(x: 4, y: 2)
+    iex> NightGame.Hero.kill(pid)
+    iex> NightGame.Hero.info(pid)
+    %NightGame.Hero{dead?: true, x: 4, y: 2}
   """
   def kill(pid) do
     GenServer.cast(pid, :kill)
@@ -110,7 +110,7 @@ defmodule NightGame.Hero do
         :right -> {state.x + 1, state.y}
         :up -> {state.x, state.y - 1}
         :down -> {state.x, state.y + 1}
-        _ -> {state.x, state.y}
+        _other -> {state.x, state.y}
       end
 
     state =

@@ -76,7 +76,7 @@ defmodule NightGame.Game do
       Enum.reduce(state.heroes, World.map(), fn {name, pid}, map ->
         case Hero.info(pid) do
           %{x: x, y: y, dead?: dead?} -> World.put_hero(map, x, y, name, dead?)
-          _ -> map
+          _other -> map
         end
       end)
 
@@ -90,7 +90,7 @@ defmodule NightGame.Game do
         %{heroes: %{^name => _pid}} ->
           state
 
-        _ ->
+        _other ->
           {x, y} = new_hero_position(position)
 
           {:ok, pid} =
@@ -118,7 +118,7 @@ defmodule NightGame.Game do
       %{heroes: %{^name => pid}} ->
         Hero.move(pid, direction)
 
-      _ ->
+      _other ->
         :nothing
     end
 
@@ -141,7 +141,7 @@ defmodule NightGame.Game do
         |> Map.values()
         |> Enum.each(&try_to_kill(attacker, Hero.info(&1), &1))
 
-      _ ->
+      _other ->
         :nothing
     end
 
@@ -153,7 +153,7 @@ defmodule NightGame.Game do
     Hero.kill(enemy_pid)
   end
 
-  defp try_to_kill(_, _, _), do: :nothing
+  defp try_to_kill(_hero, _enemy, _enemy_pid), do: :nothing
 
   defp new_hero_position(:random), do: World.random_position(World.map())
   defp new_hero_position(position), do: position
