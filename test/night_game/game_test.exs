@@ -46,7 +46,15 @@ defmodule NightGame.GameTest do
     Game.get_or_spawn_hero("test2", {3, 4})
     Game.attack("test1")
     assert World.get(Game.map(), 3, 4) == {:heroes, [{"test2", true}]}
-    Process.sleep(6000)
+
+    pid =
+      Game
+      |> :sys.get_state()
+      |> Map.get(:heroes)
+      |> Map.get("test2")
+
+    send(Game, {:DOWN, make_ref(), :process, pid, :whatever})
+
     %{x: x, y: y} = Game.get_or_spawn_hero("test2")
     assert World.get(Game.map(), x, y) == {:heroes, [{"test2", false}]}
   end
