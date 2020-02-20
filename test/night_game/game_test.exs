@@ -5,6 +5,7 @@ defmodule NightGame.GameTest do
     Game,
     World
   }
+
   doctest NightGame.Game
 
   setup do

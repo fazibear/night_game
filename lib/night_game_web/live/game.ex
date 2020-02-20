@@ -6,6 +6,7 @@ defmodule NightGameWeb.Game do
   use Phoenix.LiveView
   alias NightGame.Game
 
+  @impl true
   def render(assigns) do
     ~L"""
     <h1>
@@ -40,9 +41,10 @@ defmodule NightGameWeb.Game do
     """
   end
 
+  @impl true
   def mount(%{"name" => name}, _session, socket) do
     if connected?(socket) do
-      :timer.send_interval(100, self(), :tick)
+      Phoenix.PubSub.subscribe(NightGame.PubSub, "game")
     end
 
     socket =
@@ -51,45 +53,64 @@ defmodule NightGameWeb.Game do
       |> put_name(name)
       |> put_info(%{})
 
+    refresh()
+
     {:ok, socket}
   end
 
+  @impl true
   def handle_event("key", %{"code" => "ArrowLeft"}, socket) do
     Game.move_hero(socket.assigns.name, :left)
+    refresh()
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("key", %{"code" => "ArrowRight"}, socket) do
     Game.move_hero(socket.assigns.name, :right)
+    refresh()
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("key", %{"code" => "ArrowUp"}, socket) do
     Game.move_hero(socket.assigns.name, :up)
+    refresh()
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("key", %{"code" => "ArrowDown"}, socket) do
     Game.move_hero(socket.assigns.name, :down)
+    refresh()
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("key", %{"code" => "Space"}, socket) do
     Game.attack(socket.assigns.name)
+    refresh()
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("key", _, socket) do
+    refresh()
     {:noreply, socket}
   end
 
-  def handle_info(:tick, socket) do
+  @impl true
+  def handle_info(:refresh, socket) do
     socket =
       socket
       |> put_map()
       |> put_info(Game.get_or_spawn_hero(socket.assigns.name))
 
     {:noreply, socket}
+  end
+
+  def refresh() do
+    Phoenix.PubSub.broadcast(NightGame.PubSub, "game", :refresh)
   end
 
   defp put_map(socket) do
