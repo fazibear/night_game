@@ -12,13 +12,12 @@ defmodule NightGame.World do
 
   @width 30
 
-  @tiles __DIR__
-         |> Path.join("world.map")
-         |> File.read!()
-         |> String.split(" ", trim: true)
+  @tiles Application.get_env(:night_game, World)
+         |> IO.inspect()
          |> Enum.map(fn tile ->
            {:tile, String.trim(tile)}
          end)
+         |> IO.inspect()
 
   @doc """
   Returns map shape.
