@@ -1,154 +1,82 @@
 defmodule NightGame.World do
   @moduledoc """
-  Shape of the world.
-
-  World is loaded and parsed from `map.tiles` file.
-
-  World is the list of tuples:
-   - {:tile, :grass}
-   - {:tile, :wall}
-   - {:heroes, [{name, is_dead}]
+  World is the tuple of tuples of tuples:
+   - {:obstacle, :grass}
+   - {:ground, :wall}
+   - {:heroes, [{name, is_dead}]  
   """
 
-  @width 30
+  @map Application.get_env(:night_game, :map)
 
-  @tiles Application.get_env(:night_game, World)
-         |> IO.inspect()
-         |> Enum.map(fn tile ->
-           {:tile, String.trim(tile)}
-         end)
-         |> IO.inspect()
-
+  def map, do: @map
   @doc """
-  Returns map shape.
-
-  This functions returns array of tuples:
-    - {:tile, :wall} wall
-    - {:grass} grass where hero can walk
-  """
-  def tiles, do: @tiles
-
-  @doc """
-  Moves hero on the map. If can't move, returns same position.
-  Directions:
-   - :up
-   - :down
-   - :left
-   - :right
+  Determinates when you can move to given position.
 
   ## Examples
 
-    iex> NightGame.World.move(:left, 65)
-    64
-
-    iex> NightGame.World.move(:right, 65)
-    66
-
-    iex> NightGame.World.move(:up, 65)
-    35
-
-    iex> NightGame.World.move(:down, 65)
-    95
-
-    iex> NightGame.World.move(:up, 35)
-    35
-
-    iex> NightGame.World.move(:down, 97)
-    97
-
-    iex> NightGame.World.move(:left, 31)
-    31
-
-    iex> NightGame.World.move(:right, 59)
-    59
+    iex> NightGame.World.can_move_to?(World.map(), 4, 2)
+    true
   """
-  def move(direction, position)
-
-  def move(:up, position) do
-    move_to(position, -@width)
-  end
-
-  def move(:down, position) do
-    move_to(position, @width)
-  end
-
-  def move(:left, position) do
-    move_to(position, -1)
-  end
-
-  def move(:right, position) do
-    move_to(position, 1)
+  def can_move_to?(map, x, y) do
+    map
+    |> get(x, y)
+    |> elem(0)
+    |> Kernel.==(:ground)
   end
 
   @doc """
-  Returns list of positions has to be attacked.
+  Put a hero in given position on the map
 
   ## Examples
 
-    iex> NightGame.World.attack_positions(65)
-    [65, 66, 64, 95, 35, 96, 36, 94, 34]
-
-    iex> NightGame.World.attack_positions(31)
-    [31, 32, 61, 62]
+    iex> map = NightGame.World.put_hero(World.map(), 3, 3, "my_hero", false)
+    iex> NightGame.World.get(map, 3, 3)
+    {:heroes, [{"my_hero", false}]}
   """
-  def attack_positions(position) do
-    [
-      position,
-      position + 1,
-      position - 1,
-      position + @width,
-      position - @width,
-      position + @width + 1,
-      position - @width + 1,
-      position + @width - 1,
-      position - @width - 1
-    ]
-    |> Enum.filter(&can_move?/1)
-  end
-
-  @doc """
-  Returns rendom valid position (on the grass)
-  """
-  def random_position do
-    position =
-      @tiles
-      |> length()
-      |> :rand.uniform()
-
-    if can_move?(position) do
-      position
-    else
-      random_position()
-    end
-  end
-
-  @doc """
-  Place hero on the map.
-
-  ## Examples
-
-    iex> NightGame.World.put_hero([{:tile, :grass}], 0, "my_hero", false)
-    [{:heroes, [{"my_hero", false}]}]
-  """
-  def put_hero(map, position, name, is_dead?) do
-    case Enum.at(map, position) do
+  def put_hero(map, x, y, name, is_dead?) do
+    case get(map, x, y) do
       {:heroes, heroes} ->
-        List.replace_at(map, position, {:heroes, heroes ++ [{name, is_dead?}]})
+        put(map, x, y, {:heroes, heroes ++ [{name, is_dead?}]})
 
       _ ->
-        List.replace_at(map, position, {:heroes, [{name, is_dead?}]})
+        put(map, x, y, {:heroes, [{name, is_dead?}]})
     end
   end
 
-  defp move_to(position, delta) do
-    if can_move?(position + delta) do
-      position + delta
-    else
-      position
-    end
+  @doc """
+  Get element from given map on given position
+
+  ## Examples
+
+    iex> NightGame.World.get(World.map(), 3, 3)
+    {:ground, :grass}
+  """
+  def get(map, x, y) do
+    map
+    |> elem(y)
+    |> elem(x)
+  rescue
+    ArgumentError -> false
   end
 
-  defp can_move?(position) do
-    @tiles |> Enum.at(position) |> elem(1) == "grass"
+  @doc """
+  Put given element in given position on the map
+
+  ## Examples
+
+    iex> map = NightGame.World.put(World.map(), 3, 3, {:test, :something})
+    iex> NightGame.World.get(map, 3, 3)
+    {:test, :something}
+  """
+  def put(map, x, y, tuple) do
+    put_elem(
+      map,
+      y,
+      map
+      |> elem(y)
+      |> put_elem(x, tuple)
+    )
+  rescue
+    ArgumentError -> :error
   end
 end
