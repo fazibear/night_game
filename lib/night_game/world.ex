@@ -9,6 +9,7 @@ defmodule NightGame.World do
   @map Application.get_env(:night_game, :map)
 
   def map, do: @map
+
   @doc """
   Determinates when you can move to given position.
 
