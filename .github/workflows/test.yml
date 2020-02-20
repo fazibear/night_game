@@ -14,12 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Cache Deps
-      id: cache-deps
-      uses: actions/cache@v1
-      with:
-        path: deps
-        key: ${{ runner.os }}-deps
     - name: Install Dependencies
       run: |
         mix local.rebar --force
