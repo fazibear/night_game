@@ -8,6 +8,7 @@ defmodule NightGame.World do
 
   @map Application.get_env(:night_game, :map)
 
+  @spec map() :: tuple
   def map, do: @map
 
   @doc """
@@ -18,6 +19,7 @@ defmodule NightGame.World do
     iex> NightGame.World.can_move_to?(NightGame.World.map(), 4, 2)
     true
   """
+  @spec can_move_to?(tuple, integer, integer) :: boolean
   def can_move_to?(map, x, y) do
     map
     |> get(x, y)
@@ -34,6 +36,7 @@ defmodule NightGame.World do
     iex> NightGame.World.get(map, 3, 3)
     {:heroes, [{"my_hero", false}]}
   """
+  @spec put_hero(tuple, integer, integer, String.t(), boolean) :: tuple | :error
   def put_hero(map, x, y, name, is_dead?) do
     case get(map, x, y) do
       {:heroes, heroes} ->
@@ -52,12 +55,13 @@ defmodule NightGame.World do
     iex> NightGame.World.get(NightGame.World.map(), 3, 3)
     {:ground, :grass}
   """
+  @spec get(tuple, integer, integer) :: tuple | :error
   def get(map, x, y) do
     map
     |> elem(y)
     |> elem(x)
   rescue
-    ArgumentError -> false
+    ArgumentError -> :error
   end
 
   @doc """
@@ -69,6 +73,7 @@ defmodule NightGame.World do
     iex> NightGame.World.get(map, 3, 3)
     {:test, :something}
   """
+  @spec put(tuple, integer, integer, tuple) :: tuple | :error
   def put(map, x, y, tuple) do
     put_elem(
       map,
@@ -78,7 +83,7 @@ defmodule NightGame.World do
       |> put_elem(x, tuple)
     )
   rescue
-    ArgumentError -> :error
+    ArgumentError -> {:error, :argument_error}
   end
 
   @doc """
@@ -88,6 +93,7 @@ defmodule NightGame.World do
 
     NightGame.World.random_position(NightGame.World.map())
   """
+  @spec random_position(tuple) :: {integer, integer}
   def random_position(map) do
     map
     |> Tuple.to_list()

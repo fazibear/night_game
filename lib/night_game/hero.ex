@@ -6,6 +6,9 @@ defmodule NightGame.Hero do
   use GenServer
   alias NightGame.World
 
+  @typedoc "Hero representation"
+  @type t :: %__MODULE__{x: integer, y: integer, dead?: boolean}
+
   defstruct [:x, :y, :dead?]
 
   @exit_timeout 5000
@@ -16,6 +19,7 @@ defmodule NightGame.Hero do
     x: x
     y: y
   """
+  @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts)
   end
@@ -29,6 +33,7 @@ defmodule NightGame.Hero do
     iex> NightGame.Hero.info(pid)
     %NightGame.Hero{dead?: false, x: 11, y: 11}
   """
+  @spec info(pid) :: NightGame.Hero.t()
   def info(pid) do
     GenServer.call(pid, :info)
   end
@@ -54,6 +59,7 @@ defmodule NightGame.Hero do
     %NightGame.Hero{dead?: false, x: 4, y: 1}
 
   """
+  @spec move(pid, atom) :: :ok
   def move(pid, direction) do
     GenServer.cast(pid, {:move, direction})
   end
@@ -68,6 +74,8 @@ defmodule NightGame.Hero do
     iex> NightGame.Hero.info(pid)
     %NightGame.Hero{dead?: true, x: 4, y: 2}
   """
+
+  @spec kill(pid) :: :ok
   def kill(pid) do
     GenServer.cast(pid, :kill)
   end
