@@ -85,7 +85,10 @@ defmodule NightGame.HeroNameGenerator do
     Charlotte
     Lauri
   ]
-
+  @doc """
+  Generate random name
+  """
+  @spec random() :: String.t()
   def random do
     Enum.random(@names)
   end

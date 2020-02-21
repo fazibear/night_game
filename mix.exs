@@ -39,7 +39,8 @@ defmodule NightGame.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:credo, "~> 1.3.0-rc", only: :dev, runtime: false}
+      {:credo, "~> 1.3.0-rc", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0.0-rc", only: :dev, runtime: false}
     ]
   end
 end

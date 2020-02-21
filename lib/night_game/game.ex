@@ -10,8 +10,12 @@ defmodule NightGame.Game do
     World
   }
 
+  @typedoc "Direction to move on the map"
+  @type direction :: :left | :right | :up | :down
+
   @new_game %{heroes: %{}}
 
+  @spec start_link(list) :: :ignore | {:error, any} | {:ok, pid}
   def start_link([]) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -19,6 +23,7 @@ defmodule NightGame.Game do
   @doc """
   Returns overall game map with all tiles and heroes.
   """
+  @spec map() :: tuple()
   def map do
     GenServer.call(__MODULE__, :map)
   end
@@ -27,13 +32,15 @@ defmodule NightGame.Game do
   Get hero by name.
   If hero does not exists, spawn new one.
   """
+  @spec get_or_spawn_hero(String.t(), integer | :random) :: NightGame.Hero.t()
   def get_or_spawn_hero(name, position \\ :random) do
     GenServer.call(__MODULE__, {:get_or_spawn_hero, name, position})
   end
 
   @doc """
-  Restart game world.
+  Restart game world (will remove heroes from world, but don't kill genservers)
   """
+  @spec restart() :: :ok
   def restart do
     GenServer.cast(__MODULE__, :restart)
   end
@@ -41,6 +48,7 @@ defmodule NightGame.Game do
   @doc """
   Move hero. See `NightGame.world.move/2`
   """
+  @spec move_hero(String.t(), direction) :: :ok
   def move_hero(name, direction) do
     GenServer.cast(__MODULE__, {:move_hero, name, direction})
   end
@@ -48,6 +56,7 @@ defmodule NightGame.Game do
   @doc """
   Perform attack of the hero. Kill nearest heroes on the map.
   """
+  @spec attack(String.t()) :: :ok
   def attack(name) do
     GenServer.cast(__MODULE__, {:attack, name})
   end
@@ -76,7 +85,6 @@ defmodule NightGame.Game do
       Enum.reduce(state.heroes, World.map(), fn {name, pid}, map ->
         case Hero.info(pid) do
           %{x: x, y: y, dead?: dead?} -> World.put_hero(map, x, y, name, dead?)
-          _other -> map
         end
       end)
 
